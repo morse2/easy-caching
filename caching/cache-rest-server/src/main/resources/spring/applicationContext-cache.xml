@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+
+    <bean id="cacheService"
+          class="com.googlecode.easyec.cache.ehcache.factory.EhcacheCacheServiceFactoryBean"
+          p:cacheProvider-ref="cacheProvider"
+            />
+
+    <bean id="cacheProvider"
+          class="com.googlecode.easyec.cache.rest.RestfulEhcacheCacheProvider"
+          c:cacheManager-ref="cacheManager"
+            />
+
+    <bean id="cacheManager"
+          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
+          p:configLocation="classpath:config/ehcache.xml"
+            />
+</beans>

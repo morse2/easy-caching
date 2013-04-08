@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <jmxConfigurator/>
+
+    <property name="appName" value="CACHE_REST"/>
+    <!--<property name="LOG_HOME" value="D:/logs"/>-->
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+        <encoder charset="UTF-8" class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[${appName}] %d{yyyy-MM-dd HH:mm:ss},%p,%c,%t %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--<appender name="access_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="com.pg.account.core.logging.AccessLogFilter"/>
+        <Encoding>UTF-8</Encoding>
+        <File>${LOG_HOME}/${appName}_access.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${appName}.%d{yyyy-MM-dd}_access.log.zip</FileNamePattern>
+            &lt;!&ndash;<maxHistory>7</maxHistory>&ndash;&gt;
+
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                &lt;!&ndash; or whenever the file size reaches 100MB &ndash;&gt;
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date [%thread] %-5level %logger{80} - %msg%n</pattern>
+        </layout>
+    </appender>-->
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="access_log"/>-->
+    </root>
+
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="org.apache.xmlcommons" level="ERROR"/>
+    <logger name="org.apache.commons" level="ERROR"/>
+    <logger name="org.apache.http" level="ERROR"/>
+    <logger name="org.apache.james" level="ERROR"/>
+
+    <logger name="org.jboss" level="DEBUG"/>
+</configuration>

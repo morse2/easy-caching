@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>com.googlecode.easyec</groupId>
+        <artifactId>caching</artifactId>
+        <version>0.1.4-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>cache-rest-server</artifactId>
+    <version>0.1.4-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <name>cache-rest-server</name>
+    <url>http://code.google.com/p/easyec</url>
+    <description>
+        The web application that can run independently, using REST web service. The server bases on
+        ehcache implementation. For client, module cache-rest-spi can be used.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>3.1.4.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.easyec</groupId>
+            <artifactId>cache-rest-spi</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.easyec</groupId>
+            <artifactId>ehcache-impl</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.easyec</groupId>
+            <artifactId>ehcache-conf</artifactId>
+            <version>0.1.4-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>cache-server</finalName>
+    </build>
+</project>
