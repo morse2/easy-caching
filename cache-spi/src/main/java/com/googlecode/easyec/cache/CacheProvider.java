@@ -81,4 +81,16 @@ public interface CacheProvider {
      * @throws CacheException 操作缓存时，发生错误，则抛出此异常
      */
     CacheStatistics getStatistics(String cacheName) throws CacheException;
+
+    /**
+     * 添加一个新的缓存区的方法。
+     * <p>
+     * 如果缓存区不存在，则新增；否则忽略新增操作
+     * </p>
+     *
+     * @param cacheName 缓存区名
+     * @return 新增成功，返回真；否则返回假
+     * @throws CacheException 操作缓存时，发生错误，则抛出此异常
+     */
+    boolean addCacheIfAbsent(String cacheName) throws CacheException;
 }

@@ -18,11 +18,9 @@ import static com.googlecode.easyec.cache.ehcache.service.DefaultCacheService.GL
 import static org.springframework.util.StringUtils.hasText;
 
 /**
- * Created with IntelliJ IDEA.
- * User: JunJie
- * Date: 12-8-6
- * Time: 下午11:11
- * To change this template use File | Settings | File Templates.
+ * RESTful web service缓存方式的实现类。
+ *
+ * @author JunJie
  */
 @Path("/")
 public class CacheResourceImpl implements CacheResource, InitializingBean {
@@ -169,6 +167,17 @@ public class CacheResourceImpl implements CacheResource, InitializingBean {
         logger.info("Current status is: [" + status + "].");
 
         return Response.ok(status).build();
+    }
+
+    @GET
+    @Path("addCacheIfAbsent/{cacheName}")
+    @Produces({ MediaType.TEXT_PLAIN })
+    public Response addCacheIfAbsent(@PathParam("cacheName") String cacheName) {
+        boolean b = cacheService.addCacheIfAbsent(cacheName);
+
+        logger.info("Result of adding cache: [" + b + "].");
+
+        return Response.ok(b).build();
     }
 
     public void afterPropertiesSet() throws Exception {

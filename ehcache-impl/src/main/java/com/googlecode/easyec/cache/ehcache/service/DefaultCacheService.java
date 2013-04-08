@@ -109,4 +109,14 @@ public class DefaultCacheService implements CacheService {
             return null;
         }
     }
+
+    public boolean addCacheIfAbsent(String cacheName) {
+        try {
+            return cacheProvider.addCacheIfAbsent(cacheName);
+        } catch (CacheException e) {
+            logger.error(e.getMessage(), e);
+
+            return false;
+        }
+    }
 }

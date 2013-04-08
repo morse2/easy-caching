@@ -103,4 +103,15 @@ public interface CacheService {
      * @return 缓存区的统计信息
      */
     CacheStatistics getStatistics(String cacheName);
+
+    /**
+     * 添加一个新的缓存区的方法。
+     * <p>
+     * 如果缓存区不存在，则新增；否则忽略新增操作
+     * </p>
+     *
+     * @param cacheName 缓存区名
+     * @return 新增成功，返回真；否则返回假
+     */
+    boolean addCacheIfAbsent(String cacheName);
 }

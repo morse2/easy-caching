@@ -47,4 +47,12 @@ public class MainTest extends AbstractJUnit4SpringContextTests {
         Object o = CacheHelper.readObjectFromBytes(bs);
         System.out.println(o);
     }
+
+    @Test
+    public void addCache() throws Exception {
+        boolean b1 = cacheService.addCacheIfAbsent("MyCache1");
+        Assert.assertTrue(b1);
+        b1 = cacheService.addCacheIfAbsent("MyCache1");
+        Assert.assertFalse(b1);
+    }
 }

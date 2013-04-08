@@ -5,8 +5,11 @@ import com.googlecode.easyec.cache.util.CacheHelper;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.ObjectExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * 默认的本地缓存配置提供者类。
@@ -131,6 +134,23 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
 
             return null;
         } catch (Exception e) {
+            throw new CacheException(e);
+        }
+    }
+
+    public boolean addCacheIfAbsent(String cacheName) throws CacheException {
+        try {
+            if (isBlank(cacheName)) return false;
+            cacheManager.addCache(cacheName);
+
+            return true;
+        } catch (IllegalStateException e) {
+            throw new CacheException(e);
+        } catch (ObjectExistsException e) {
+            logger.warn(e.getMessage());
+
+            return false;
+        } catch (net.sf.ehcache.CacheException e) {
             throw new CacheException(e);
         }
     }

@@ -49,4 +49,8 @@ public class EhcacheEmbeddedCacheProvider implements CacheProvider {
     public CacheStatistics getStatistics(String cacheName) throws CacheException {
         return cacheProvider.getStatistics(cacheName);
     }
+
+    public boolean addCacheIfAbsent(String cacheName) throws CacheException {
+        return cacheProvider.addCacheIfAbsent(cacheName);
+    }
 }

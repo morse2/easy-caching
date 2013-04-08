@@ -9,11 +9,9 @@ import org.slf4j.LoggerFactory;
 import static com.googlecode.easyec.cache.util.CacheHelper.readObjectFromBytes;
 
 /**
- * Created with IntelliJ IDEA.
- * User: JunJie
- * Date: 12-8-7
- * Time: 上午1:07
- * To change this template use File | Settings | File Templates.
+ * RESTful缓存资源提供者类
+ *
+ * @author JunJie
  */
 public class CacheResourceProvider implements CacheProvider {
 
@@ -109,5 +107,9 @@ public class CacheResourceProvider implements CacheProvider {
 
     public CacheStatistics getStatistics(String cacheName) throws CacheException {
         throw new UnsupportedOperationException("cache name: [" + cacheName + "].");
+    }
+
+    public boolean addCacheIfAbsent(String cacheName) throws CacheException {
+        return (Boolean) cacheResource.addCacheIfAbsent(cacheName).getEntity();
     }
 }

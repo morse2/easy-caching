@@ -33,4 +33,10 @@ public interface CacheResource {
     @Consumes({ MediaType.TEXT_PLAIN })
     @ClientResponseType(entityType = String.class)
     Response status(@PathParam("cacheName") String cacheName);
+
+    @GET
+    @Path("addCacheIfAbsent/{cacheName}")
+    @Consumes({ MediaType.TEXT_PLAIN })
+    @ClientResponseType(entityType = Boolean.class)
+    Response addCacheIfAbsent(@PathParam("cacheName") String cacheName);
 }

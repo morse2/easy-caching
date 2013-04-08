@@ -36,4 +36,8 @@ public class NoOpCacheProvider implements CacheProvider {
     public CacheStatistics getStatistics(String cacheName) throws CacheException {
         return null;
     }
+
+    public boolean addCacheIfAbsent(String cacheName) throws CacheException {
+        return true;
+    }
 }
