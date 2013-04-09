@@ -1,11 +1,11 @@
 package com.googlecode.easyec.cache.util;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * 缓存帮助类。
@@ -14,22 +14,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class CacheHelper {
 
-    private static final ThreadLocal<Kryo> _t = new ThreadLocal<Kryo>();
     private static final int BUFFER_SIZE = 256;
-
-    private static Kryo getKryo() {
-        synchronized (_t) {
-            Kryo kryo = _t.get();
-
-            if (null == kryo) {
-                kryo = new Kryo();
-
-                _t.set(kryo);
-            }
-
-            return kryo;
-        }
-    }
 
     /**
      * 将字节码转换成对象信息。如果字节码对象为null，则此方法返回null。
@@ -40,12 +25,13 @@ public class CacheHelper {
      */
     public static Object readObjectFromBytes(byte[] bs) throws Exception {
         if (bs != null) {
-            Input in = new Input(new ByteArrayInputStream(bs), BUFFER_SIZE);
+            ByteArrayInputStream in = new ByteArrayInputStream(bs);
+            ObjectInputStream i = new ObjectInputStream(in);
 
             try {
-                return getKryo().readClassAndObject(in);
+                return i.readObject();
             } finally {
-                in.close();
+                IOUtils.closeQuietly(in);
             }
         }
 
@@ -61,38 +47,18 @@ public class CacheHelper {
      */
     public static byte[] writeObjectToBytes(Object o) throws Exception {
         if (o != null) {
-            Output out = new Output(new ByteArrayOutputStream(), BUFFER_SIZE);
-            try {
-                getKryo().writeClassAndObject(out, o);
+            ByteArrayOutputStream out = new ByteArrayOutputStream(BUFFER_SIZE);
+            ObjectOutputStream s = new ObjectOutputStream(out);
 
-                return out.toBytes();
+            try {
+                s.writeObject(o);
+
+                return out.toByteArray();
             } finally {
-                out.close();
+                IOUtils.closeQuietly(out);
             }
         }
 
         return null;
-    }
-
-    /**
-     * 深度拷贝对象。
-     *
-     * @param o   要被拷贝的对象
-     * @param <T> 泛型对象
-     * @return 对象副本
-     */
-    public static <T> T copy(T o) {
-        return getKryo().copy(o);
-    }
-
-    /**
-     * 浅拷贝对象。
-     *
-     * @param o   要被拷贝的对象
-     * @param <T> 泛型对象
-     * @return 对象副本
-     */
-    public static <T> T copyShallow(T o) {
-        return getKryo().copyShallow(o);
     }
 }
