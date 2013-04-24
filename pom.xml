@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.googlecode.easyec</groupId>
     <artifactId>caching</artifactId>
-    <version>0.1.5-SNAPSHOT</version>
+    <version>0.1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>caching</name>
     <url>http://code.google.com/p/easyec</url>
@@ -79,12 +79,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.1</version>
         </dependency>
 
