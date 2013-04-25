@@ -9,5 +9,9 @@
         http://easyec.googlecode.com/schema/cache/ehcache/ehcache.xsd"
        default-lazy-init="true">
 
-    <ehcache:default id="cacheService"/>
+    <ehcache:default id="cacheService" serializerFactory="serializerFactory"/>
+
+    <bean id="serializerFactory"
+          class="com.googlecode.easyec.cache.serializer.kryo.KryoSerializerFactory"
+            />
 </beans>

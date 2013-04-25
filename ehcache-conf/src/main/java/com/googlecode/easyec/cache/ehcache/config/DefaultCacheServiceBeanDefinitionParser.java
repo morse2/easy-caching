@@ -41,6 +41,12 @@ class DefaultCacheServiceBeanDefinitionParser extends AbstractSingleBeanDefiniti
         BeanDefinitionBuilder cacheProvider = rootBeanDefinition(EhcacheDefaultCacheProvider.class);
         cacheProvider.addConstructorArgValue(cacheManagerFactory.getBeanDefinition());
 
+        // 如果设置了序列化工厂类，则添加构造方法的引用
+        String serializerFactory = element.getAttribute("serializerFactory");
+        if (StringUtils.hasText(serializerFactory)) {
+            cacheProvider.addConstructorArgReference(serializerFactory);
+        }
+
         bean.addPropertyValue("cacheProvider", cacheProvider.getBeanDefinition());
     }
 

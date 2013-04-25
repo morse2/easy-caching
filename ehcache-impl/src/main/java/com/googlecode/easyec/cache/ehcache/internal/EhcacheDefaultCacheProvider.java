@@ -1,7 +1,8 @@
 package com.googlecode.easyec.cache.ehcache.internal;
 
 import com.googlecode.easyec.cache.*;
-import com.googlecode.easyec.cache.util.CacheHelper;
+import com.googlecode.easyec.cache.serializer.SerializerFactory;
+import com.googlecode.easyec.cache.serializer.impl.DefaultSerializerFactory;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -19,10 +20,19 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 public class EhcacheDefaultCacheProvider implements CacheProvider {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected SerializerFactory serializerFactory = new DefaultSerializerFactory();
     protected CacheManager cacheManager;
 
     public EhcacheDefaultCacheProvider(CacheManager cacheManager) {
+        this(cacheManager, null);
+    }
+
+    public EhcacheDefaultCacheProvider(CacheManager cacheManager, SerializerFactory serializerFactory) {
         this.cacheManager = cacheManager;
+
+        if (null != serializerFactory) {
+            this.serializerFactory = serializerFactory;
+        }
     }
 
     public boolean put(String cacheName, Object cacheKey, Object value) throws CacheException {
@@ -40,7 +50,7 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
                 if (value instanceof Element) {
                     cache.put((Element) value);
                 } else {
-                    cache.put(new Element(cacheKey, CacheHelper.writeObjectToBytes(value)));
+                    cache.put(new Element(cacheKey, serializerFactory.writeObject(value)));
                 }
 
                 return true;
@@ -60,7 +70,7 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
                     throw new CacheException("cache key is null.");
                 }
 
-                Element e = new Element(element.getKey(), CacheHelper.writeObjectToBytes(element));
+                Element e = new Element(element.getKey(), serializerFactory.writeObject(element));
                 if (element.getTimeToIdle() > 0) {
                     e.setTimeToIdle(element.getTimeToIdle());
                 }
@@ -84,7 +94,7 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
         try {
             Element element = cacheManager.getCache(cacheName).get(cacheKey);
             if (element != null) {
-                Object o = CacheHelper.readObjectFromBytes((byte[]) element.getValue());
+                Object o = serializerFactory.readObject((byte[]) element.getValue());
                 if (o instanceof CacheElement) {
                     CacheElement e = (CacheElement) o;
                     e.setHitCount(element.getHitCount());

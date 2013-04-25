@@ -1,16 +1,13 @@
 package com.googlecode.easyec.cache.rest.jaxb;
 
-import com.googlecode.easyec.cache.util.CacheHelper;
-
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Administrator
- * Date: 12-8-6
- * Time: 下午5:26
- * To change this template use File | Settings | File Templates.
+ * RESTful缓存对象实体类。
+ * <p>此类用于和RESTful服务端交互时的数据载体</p>
+ *
+ * @author JunJie
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -27,21 +24,14 @@ public class CacheObject {
         // no op
     }
 
-    public CacheObject(String key, Object v) throws Exception {
-        this(null, key, v);
+    public CacheObject(String key, byte[] ser) throws Exception {
+        this(null, key, ser);
     }
 
-    public CacheObject(String cacheName, String key, Object v) throws Exception {
+    public CacheObject(String cacheName, String key, byte[] ser) throws Exception {
         this.cacheName = cacheName;
         this.key = key;
-
-        if (v != null) {
-            if (v instanceof byte[]) {
-                this.ser = (byte[]) v;
-            } else {
-                this.ser = CacheHelper.writeObjectToBytes(v);
-            }
-        }
+        this.ser = ser;
     }
 
     public String getCacheName() {

@@ -22,6 +22,7 @@
                 <xsd:extension base="beans:identifiedType">
                     <xsd:attribute name="shared" type="xsd:boolean" default="false"/>
                     <xsd:attribute name="cacheManagerName" type="xsd:string"/>
+                    <xsd:attribute name="serializerFactory" type="xsd:string"/>
                     <xsd:attribute name="configLocation" type="xsd:string" default="classpath:ehcache.xml"/>
                 </xsd:extension>
             </xsd:complexContent>

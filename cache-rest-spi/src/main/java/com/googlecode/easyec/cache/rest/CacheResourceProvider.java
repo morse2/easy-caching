@@ -2,11 +2,11 @@ package com.googlecode.easyec.cache.rest;
 
 import com.googlecode.easyec.cache.*;
 import com.googlecode.easyec.cache.rest.jaxb.CacheObject;
+import com.googlecode.easyec.cache.serializer.SerializerFactory;
+import com.googlecode.easyec.cache.serializer.impl.DefaultSerializerFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.googlecode.easyec.cache.util.CacheHelper.readObjectFromBytes;
 
 /**
  * RESTful缓存资源提供者类
@@ -16,10 +16,19 @@ import static com.googlecode.easyec.cache.util.CacheHelper.readObjectFromBytes;
 public class CacheResourceProvider implements CacheProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheResourceProvider.class);
+    private SerializerFactory serializerFactory = new DefaultSerializerFactory();
     private CacheResource cacheResource;
 
     public CacheResourceProvider(CacheResource cacheResource) {
+        this(cacheResource, null);
+    }
+
+    public CacheResourceProvider(CacheResource cacheResource, SerializerFactory serializerFactory) {
         this.cacheResource = cacheResource;
+
+        if (null != serializerFactory) {
+            this.serializerFactory = serializerFactory;
+        }
     }
 
     public boolean put(String cacheName, Object cacheKey, Object value) throws CacheException {
@@ -30,7 +39,7 @@ public class CacheResourceProvider implements CacheProvider {
                 return false;
             }
 
-            cacheResource.put(new CacheObject(cacheName, String.valueOf(cacheKey), value));
+            cacheResource.put(new CacheObject(cacheName, String.valueOf(cacheKey), serializerFactory.writeObject(value)));
 
             return true;
         } catch (Exception e) {
@@ -53,7 +62,7 @@ public class CacheResourceProvider implements CacheProvider {
                 logger.warn("Cache key in CacheElement object is null, so ignore put operation.");
             }
 
-            cacheResource.put(new CacheObject(cacheName, String.valueOf(key), element));
+            cacheResource.put(new CacheObject(cacheName, String.valueOf(key), serializerFactory.writeObject(element)));
 
             return true;
         } catch (Exception e) {
@@ -71,7 +80,7 @@ public class CacheResourceProvider implements CacheProvider {
         try {
             Object entity = res.getEntity(CacheObject.class);
 
-            return entity != null ? readObjectFromBytes(((CacheObject) entity).getSer()) : null;
+            return entity != null ? serializerFactory.readObject(((CacheObject) entity).getSer()) : null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
 

@@ -103,7 +103,7 @@ public class CacheResourceImpl implements CacheResource, InitializingBean {
                 break;
             case STATUS_ALIVE:
                 logger.info("Get into cache. cache name: [" + cacheName + "].");
-                Object v = cacheService.get(cacheName, key);
+                byte[] v = (byte[]) cacheService.get(cacheName, key);
 
                 try {
                     return Response.ok(new CacheObject(cacheName, key, v)).build();
