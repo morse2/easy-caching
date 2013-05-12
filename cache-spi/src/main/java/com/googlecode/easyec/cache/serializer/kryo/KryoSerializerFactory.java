@@ -2,10 +2,11 @@ package com.googlecode.easyec.cache.serializer.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.ReferenceResolver;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.JavaSerializer;
+import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.googlecode.easyec.cache.serializer.SerializationException;
 import com.googlecode.easyec.cache.serializer.SerializerFactory;
 import org.apache.commons.io.IOUtils;
@@ -27,17 +28,27 @@ import java.util.Set;
 public class KryoSerializerFactory implements SerializerFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(KryoSerializerFactory.class);
-    private static final Kryo kryo = new Kryo();
+    private ReferenceResolver referenceResolver = new MapReferenceResolver();
+    private Map<Class<?>, Serializer<?>> defaultSerializers;
+    private Class<? extends Serializer> defaultSerializer;
+    private InstantiatorStrategy instantiatorStrategy;
+
+    /**
+     * 为当前Kryo设置一个默认的引用解析器实例
+     *
+     * @param referenceResolver <code>ReferenceResolver</code>对象
+     */
+    public void setReferenceResolver(ReferenceResolver referenceResolver) {
+        if (null != referenceResolver) this.referenceResolver = referenceResolver;
+    }
 
     /**
      * 为当前Kryo设置一个默认的根序列化处理器对象
      *
      * @param defaultSerializer 全局默认的序列化处理器对象
      */
-    public void setDefaultSerializer(Class<JavaSerializer> defaultSerializer) {
-        if (null != defaultSerializer) {
-            kryo.setDefaultSerializer(defaultSerializer);
-        }
+    public void setDefaultSerializer(Class<? extends Serializer> defaultSerializer) {
+        this.defaultSerializer = defaultSerializer;
     }
 
     /**
@@ -46,9 +57,7 @@ public class KryoSerializerFactory implements SerializerFactory {
      * @param instantiatorStrategy <code>InstantiatorStrategy</code>对象
      */
     public void setInstantiatorStrategy(InstantiatorStrategy instantiatorStrategy) {
-        if (null != instantiatorStrategy) {
-            kryo.setInstantiatorStrategy(instantiatorStrategy);
-        }
+        this.instantiatorStrategy = instantiatorStrategy;
     }
 
     /**
@@ -57,6 +66,56 @@ public class KryoSerializerFactory implements SerializerFactory {
      * @param defaultSerializers <code>Map</code>列表
      */
     public void setDefaultSerializers(Map<Class<?>, Serializer<?>> defaultSerializers) {
+        this.defaultSerializers = defaultSerializers;
+    }
+
+    public byte[] writeObject(Object o) throws SerializationException {
+        Output output = null;
+
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            output = new Output(out);
+            getInstance().writeClassAndObject(output, o);
+
+            output.flush();
+
+            return out.toByteArray();
+        } catch (KryoException e) {
+            logger.error(e.getMessage(), e);
+
+            throw new SerializationException(e);
+        } finally {
+            IOUtils.closeQuietly(output);
+        }
+    }
+
+    public Object readObject(byte[] bs) throws SerializationException {
+        Input input = null;
+
+        try {
+            input = new Input(bs);
+
+            return getInstance().readClassAndObject(input);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+
+            throw new SerializationException(e);
+        } finally {
+            IOUtils.closeQuietly(input);
+        }
+    }
+
+    /**
+     * 初始化<code>Kryo</code>对象实例的方法
+     *
+     * @return 返回一个新的Kryo对象
+     */
+    private synchronized Kryo getInstance() {
+        Kryo kryo = new Kryo(referenceResolver);
+
+        if (null != defaultSerializer) kryo.setDefaultSerializer(defaultSerializer);
+        if (null != instantiatorStrategy) kryo.setInstantiatorStrategy(instantiatorStrategy);
+
         if (null != defaultSerializers && !defaultSerializers.isEmpty()) {
             Set<Class<?>> classes = defaultSerializers.keySet();
             for (Class<?> cls : classes) {
@@ -66,45 +125,7 @@ public class KryoSerializerFactory implements SerializerFactory {
                 kryo.addDefaultSerializer(cls, serializer);
             }
         }
-    }
 
-    public byte[] writeObject(Object o) throws SerializationException {
-        synchronized (kryo) {
-            Output output = null;
-
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                output = new Output(out);
-                kryo.writeClassAndObject(output, o);
-
-                output.flush();
-
-                return out.toByteArray();
-            } catch (KryoException e) {
-                logger.error(e.getMessage(), e);
-
-                throw new SerializationException(e);
-            } finally {
-                IOUtils.closeQuietly(output);
-            }
-        }
-    }
-
-    public Object readObject(byte[] bs) throws SerializationException {
-        synchronized (kryo) {
-            Input input = null;
-
-            try {
-                input = new Input(bs);
-
-                return kryo.readClassAndObject(input);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-
-                throw new SerializationException(e);
-            } finally {
-                IOUtils.closeQuietly(input);
-            }
-        }
+        return kryo;
     }
 }
