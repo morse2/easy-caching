@@ -2,11 +2,9 @@ package com.googlecode.easyec.cache.serializer.kryo;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
-import com.esotericsoftware.kryo.ReferenceResolver;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.util.MapReferenceResolver;
 import com.googlecode.easyec.cache.serializer.SerializationException;
 import com.googlecode.easyec.cache.serializer.SerializerFactory;
 import org.apache.commons.io.IOUtils;
@@ -28,19 +26,9 @@ import java.util.Set;
 public class KryoSerializerFactory implements SerializerFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(KryoSerializerFactory.class);
-    private ReferenceResolver referenceResolver = new MapReferenceResolver();
     private Map<Class<?>, Serializer<?>> defaultSerializers;
     private Class<? extends Serializer> defaultSerializer;
     private InstantiatorStrategy instantiatorStrategy;
-
-    /**
-     * 为当前Kryo设置一个默认的引用解析器实例
-     *
-     * @param referenceResolver <code>ReferenceResolver</code>对象
-     */
-    public void setReferenceResolver(ReferenceResolver referenceResolver) {
-        if (null != referenceResolver) this.referenceResolver = referenceResolver;
-    }
 
     /**
      * 为当前Kryo设置一个默认的根序列化处理器对象
@@ -111,7 +99,7 @@ public class KryoSerializerFactory implements SerializerFactory {
      * @return 返回一个新的Kryo对象
      */
     private synchronized Kryo getInstance() {
-        Kryo kryo = new Kryo(referenceResolver);
+        Kryo kryo = new Kryo();
 
         if (null != defaultSerializer) kryo.setDefaultSerializer(defaultSerializer);
         if (null != instantiatorStrategy) kryo.setInstantiatorStrategy(instantiatorStrategy);
