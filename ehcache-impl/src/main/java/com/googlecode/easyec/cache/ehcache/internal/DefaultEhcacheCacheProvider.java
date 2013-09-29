@@ -2,13 +2,13 @@ package com.googlecode.easyec.cache.ehcache.internal;
 
 import com.googlecode.easyec.cache.*;
 import com.googlecode.easyec.cache.serializer.SerializerFactory;
-import com.googlecode.easyec.cache.serializer.impl.DefaultSerializerFactory;
-import net.sf.ehcache.Cache;
+import com.googlecode.easyec.cache.serializer.impl.NoOpSerializerFactory;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ObjectExistsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -17,59 +17,26 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  *
  * @author JunJie
  */
-public class EhcacheDefaultCacheProvider implements CacheProvider {
+public class DefaultEhcacheCacheProvider implements CacheProvider {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    protected SerializerFactory serializerFactory = new DefaultSerializerFactory();
+
+    protected SerializerFactory serializerFactory = new NoOpSerializerFactory();
     protected CacheManager cacheManager;
 
-    public EhcacheDefaultCacheProvider(CacheManager cacheManager) {
-        this(cacheManager, null);
-    }
-
-    public EhcacheDefaultCacheProvider(CacheManager cacheManager, SerializerFactory serializerFactory) {
+    public DefaultEhcacheCacheProvider(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-
-        if (null != serializerFactory) {
-            this.serializerFactory = serializerFactory;
-        }
     }
 
-    public boolean put(String cacheName, Object cacheKey, Object value) throws CacheException {
-        try {
-            if (value != null) {
-                if (value instanceof CacheElement) {
-                    return put(cacheName, (CacheElement) value);
-                }
-
-                if (cacheKey == null) {
-                    throw new CacheException("cache key is null.");
-                }
-
-                Cache cache = cacheManager.getCache(cacheName);
-                if (value instanceof Element) {
-                    cache.put((Element) value);
-                } else {
-                    cache.put(new Element(cacheKey, serializerFactory.writeObject(value)));
-                }
-
-                return true;
-            }
-
-            logger.warn("Value of key: [" + cacheKey + "] is null when put into cache: [" + cacheName + "].");
-            return false;
-        } catch (Exception e) {
-            throw new CacheException(e);
-        }
+    public DefaultEhcacheCacheProvider(CacheManager cacheManager, SerializerFactory serializerFactory) {
+        Assert.notNull(serializerFactory, "SerializerFactory object cannot be null.");
+        this.cacheManager = cacheManager;
+        this.serializerFactory = serializerFactory;
     }
 
     public boolean put(String cacheName, CacheElement element) throws CacheException {
         try {
-            if (element != null) {
-                if (element.getKey() == null) {
-                    throw new CacheException("cache key is null.");
-                }
-
+            if (null != element) {
                 Element e = new Element(element.getKey(), serializerFactory.writeObject(element));
                 if (element.getTimeToIdle() > 0) {
                     e.setTimeToIdle(element.getTimeToIdle());
@@ -90,21 +57,17 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
         }
     }
 
-    public Object get(String cacheName, Object cacheKey) throws CacheException {
+    @SuppressWarnings("unchecked")
+    public CacheElement get(String cacheName, Object cacheKey) throws CacheException {
         try {
             Element element = cacheManager.getCache(cacheName).get(cacheKey);
-            if (element != null) {
-                Object o = serializerFactory.readObject((byte[]) element.getValue());
-                if (o instanceof CacheElement) {
-                    CacheElement e = (CacheElement) o;
-                    e.setHitCount(element.getHitCount());
-                    e.setLastUpdateTime(element.getLastUpdateTime());
-                }
+            if (null == element) return null;
 
-                return o;
-            }
-
-            return null;
+            CacheElement e = (CacheElement) serializerFactory.readObject(element.getObjectValue());
+            return new CacheElement.Builder(e.getKey(), e.getValue())
+                .hitCount(element.getHitCount())
+                .lastUpdateTime(element.getLastUpdateTime())
+                .build();
         } catch (Exception e) {
             throw new CacheException(e);
         }
@@ -139,7 +102,7 @@ public class EhcacheDefaultCacheProvider implements CacheProvider {
         try {
             net.sf.ehcache.Statistics statistics = cacheManager.getCache(cacheName).getStatistics();
             if (statistics != null) {
-                return new EhcacheDefaultCacheStatistics(statistics);
+                return new DefaultEhcacheCacheStatistics(statistics);
             }
 
             return null;

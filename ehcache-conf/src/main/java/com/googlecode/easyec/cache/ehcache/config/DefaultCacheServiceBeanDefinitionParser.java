@@ -1,7 +1,7 @@
 package com.googlecode.easyec.cache.ehcache.config;
 
 import com.googlecode.easyec.cache.ehcache.factory.EhcacheCacheServiceFactoryBean;
-import com.googlecode.easyec.cache.ehcache.internal.EhcacheDefaultCacheProvider;
+import com.googlecode.easyec.cache.ehcache.internal.DefaultEhcacheCacheProvider;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
@@ -38,7 +38,7 @@ class DefaultCacheServiceBeanDefinitionParser extends AbstractSingleBeanDefiniti
             cacheManagerFactory.addPropertyValue("cacheManagerName", cacheManagerName);
         }
 
-        BeanDefinitionBuilder cacheProvider = rootBeanDefinition(EhcacheDefaultCacheProvider.class);
+        BeanDefinitionBuilder cacheProvider = rootBeanDefinition(DefaultEhcacheCacheProvider.class);
         cacheProvider.addConstructorArgValue(cacheManagerFactory.getBeanDefinition());
 
         // 如果设置了序列化工厂类，则添加构造方法的引用

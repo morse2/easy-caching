@@ -16,8 +16,8 @@ public abstract class SpelCacheCallback {
 
     private final ExpressionEvaluator expressionEvaluator = new ExpressionEvaluator();
     private boolean beforeInvocation;
-    private String caches[];
-    private String key;
+    private String  caches[];
+    private String  key;
 
     protected SpelCacheCallback(String[] caches, String key) {
         this.caches = caches;
@@ -70,16 +70,10 @@ public abstract class SpelCacheCallback {
      * @return <code>CacheElement</code>实例对象
      */
     protected CacheElement createCacheElement(Object key, Object value, int timeToLive, int timeToIdle) {
-        CacheElement e = new AnnotatedCacheElement(key, value);
-        if (timeToIdle > 0) {
-            e.setTimeToIdle(timeToIdle * 1000);
-        }
-
-        if (timeToLive > 0) {
-            e.setTimeToLive(timeToLive * 1000);
-        }
-
-        return e;
+        return new CacheElement.Builder(key, value)
+            .timeToIdle(timeToIdle * 1000)
+            .timeToLive(timeToLive * 1000)
+            .build();
     }
 
     /**

@@ -8,17 +8,6 @@ package com.googlecode.easyec.cache;
 public interface CacheProvider {
 
     /**
-     * 向缓存中推入一个缓存对象。
-     *
-     * @param cacheName 缓存区的名字
-     * @param cacheKey  缓存区中的缓存名
-     * @param value     缓存对象
-     * @return 推入成功，返回true；否则返回false
-     * @throws CacheException 操作缓存时，发生错误，则抛出此异常
-     */
-    boolean put(String cacheName, Object cacheKey, Object value) throws CacheException;
-
-    /**
      * 向缓存中推入一个{@link CacheElement}对象。
      * <p>
      * 此对象可以指定缓存元素存在的时间。例如：活动失效时间和空闲失效时间
@@ -28,7 +17,6 @@ public interface CacheProvider {
      * @param element   缓存元素对象
      * @return 推入成功，返回true；否则返回false
      * @throws CacheException 操作缓存时，发生错误，则抛出此异常
-     * @since 0.2.2
      */
     boolean put(String cacheName, CacheElement element) throws CacheException;
 
@@ -37,10 +25,10 @@ public interface CacheProvider {
      *
      * @param cacheName 缓存区的名字
      * @param cacheKey  缓存区中的缓存名
-     * @return 缓存的对象信息
+     * @return 缓存元素对象
      * @throws CacheException 操作缓存时，发生错误，则抛出此异常
      */
-    Object get(String cacheName, Object cacheKey) throws CacheException;
+    CacheElement get(String cacheName, Object cacheKey) throws CacheException;
 
     /**
      * 从缓存中删除一个缓存对象。

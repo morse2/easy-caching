@@ -14,23 +14,19 @@ import com.googlecode.easyec.cache.*;
  *
  * @author JunJie
  */
-public class EhcacheEmbeddedCacheProvider implements CacheProvider {
+public class EhcacheCacheProviderDecorator implements CacheProvider {
 
     private CacheProvider cacheProvider;
 
-    public EhcacheEmbeddedCacheProvider(CacheProvider cacheProvider) {
+    public EhcacheCacheProviderDecorator(CacheProvider cacheProvider) {
         this.cacheProvider = cacheProvider;
-    }
-
-    public boolean put(String cacheName, Object cacheKey, Object value) throws CacheException {
-        return cacheProvider.put(cacheName, cacheKey, value);
     }
 
     public boolean put(String cacheName, CacheElement element) throws CacheException {
         return cacheProvider.put(cacheName, element);
     }
 
-    public Object get(String cacheName, Object cacheKey) throws CacheException {
+    public CacheElement get(String cacheName, Object cacheKey) throws CacheException {
         return cacheProvider.get(cacheName, cacheKey);
     }
 

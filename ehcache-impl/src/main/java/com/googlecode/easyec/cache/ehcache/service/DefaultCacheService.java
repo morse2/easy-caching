@@ -4,6 +4,8 @@ import com.googlecode.easyec.cache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.googlecode.easyec.cache.CacheElement.Builder;
+
 /**
  * 默认的缓存服务实现类。
  * <p>
@@ -17,9 +19,9 @@ public class DefaultCacheService implements CacheService {
     /**
      * 全局默认的缓存名
      */
-    public static final String GLOBAL_CACHE_NAME = "globalCache";
+    public static final  String GLOBAL_CACHE_NAME = "globalCache";
+    private static final Logger logger            = LoggerFactory.getLogger(DefaultCacheService.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultCacheService.class);
     private String globalCacheName = GLOBAL_CACHE_NAME;
     private CacheProvider cacheProvider;
 
@@ -42,7 +44,9 @@ public class DefaultCacheService implements CacheService {
 
     public Object get(String cacheName, Object key) {
         try {
-            return cacheProvider.get(cacheName, key);
+            CacheElement e = cacheProvider.get(cacheName, key);
+            if (null == e) return null;
+            return e.getValue();
         } catch (CacheException e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -55,7 +59,10 @@ public class DefaultCacheService implements CacheService {
 
     public boolean put(String cacheName, Object key, Object object) {
         try {
-            return cacheProvider.put(cacheName, key, object);
+            return cacheProvider.put(
+                cacheName,
+                new Builder(key, object).build()
+            );
         } catch (CacheException e) {
             logger.error(e.getMessage(), e);
             return false;

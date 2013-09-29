@@ -5,12 +5,12 @@ import com.googlecode.easyec.cache.CacheStatistics;
 /**
  * 默认缓存区统计信息实现类。
  */
-public class EhcacheDefaultCacheStatistics extends CacheStatistics {
+public class DefaultEhcacheCacheStatistics extends CacheStatistics {
 
-    private static final long serialVersionUID = 1850208444986142951L;
+    private static final long serialVersionUID = 5304085968934696681L;
     private net.sf.ehcache.Statistics statistics;
 
-    public EhcacheDefaultCacheStatistics(net.sf.ehcache.Statistics statistics) {
+    public DefaultEhcacheCacheStatistics(net.sf.ehcache.Statistics statistics) {
         this.statistics = statistics;
     }
 

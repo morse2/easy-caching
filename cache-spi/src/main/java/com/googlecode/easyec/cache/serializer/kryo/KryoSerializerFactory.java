@@ -3,12 +3,14 @@ package com.googlecode.easyec.cache.serializer.kryo;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.Serializer;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.factories.ReflectionSerializerFactory;
+import com.esotericsoftware.kryo.io.UnsafeInput;
+import com.esotericsoftware.kryo.io.UnsafeOutput;
 import com.googlecode.easyec.cache.serializer.SerializationException;
 import com.googlecode.easyec.cache.serializer.SerializerFactory;
 import org.apache.commons.io.IOUtils;
 import org.objenesis.strategy.InstantiatorStrategy;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -23,12 +25,12 @@ import java.util.Set;
  *
  * @author JunJie
  */
-public class KryoSerializerFactory implements SerializerFactory {
+public class KryoSerializerFactory implements SerializerFactory<byte[]> {
 
     private static final Logger logger = LoggerFactory.getLogger(KryoSerializerFactory.class);
     private Map<Class<?>, Serializer<?>> defaultSerializers;
-    private Class<? extends Serializer> defaultSerializer;
-    private InstantiatorStrategy instantiatorStrategy;
+    private Class<? extends Serializer>  defaultSerializer;
+    private InstantiatorStrategy         instantiatorStrategy;
 
     /**
      * 为当前Kryo设置一个默认的根序列化处理器对象
@@ -58,11 +60,11 @@ public class KryoSerializerFactory implements SerializerFactory {
     }
 
     public byte[] writeObject(Object o) throws SerializationException {
-        Output output = null;
+        UnsafeOutput output = null;
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            output = new Output(out);
+            output = new UnsafeOutput(out);
             getInstance().writeClassAndObject(output, o);
 
             output.flush();
@@ -78,10 +80,10 @@ public class KryoSerializerFactory implements SerializerFactory {
     }
 
     public Object readObject(byte[] bs) throws SerializationException {
-        Input input = null;
+        UnsafeInput input = null;
 
         try {
-            input = new Input(bs);
+            input = new UnsafeInput(bs);
 
             return getInstance().readClassAndObject(input);
         } catch (Exception e) {
@@ -101,8 +103,9 @@ public class KryoSerializerFactory implements SerializerFactory {
     private synchronized Kryo getInstance() {
         Kryo kryo = new Kryo();
 
-        if (null != defaultSerializer) kryo.setDefaultSerializer(defaultSerializer);
+        if (null != defaultSerializer) kryo.setDefaultSerializer(new ReflectionSerializerFactory(defaultSerializer));
         if (null != instantiatorStrategy) kryo.setInstantiatorStrategy(instantiatorStrategy);
+        else kryo.setInstantiatorStrategy(new SerializingInstantiatorStrategy());
 
         if (null != defaultSerializers && !defaultSerializers.isEmpty()) {
             Set<Class<?>> classes = defaultSerializers.keySet();

@@ -9,15 +9,11 @@ import com.googlecode.easyec.cache.*;
  */
 public class NoOpCacheProvider implements CacheProvider {
 
-    public boolean put(String cacheName, Object cacheKey, Object value) throws CacheException {
-        return true;
-    }
-
     public boolean put(String cacheName, CacheElement element) throws CacheException {
         return true;
     }
 
-    public Object get(String cacheName, Object cacheKey) throws CacheException {
+    public CacheElement get(String cacheName, Object cacheKey) throws CacheException {
         return null;
     }
 
