@@ -3,7 +3,7 @@ package com.googlecode.easyec.cache.rest;
 import com.googlecode.easyec.cache.*;
 import com.googlecode.easyec.cache.rest.jaxb.CacheObject;
 import com.googlecode.easyec.cache.serializer.SerializerFactory;
-import com.googlecode.easyec.cache.serializer.impl.DefaultSerializerFactory;
+import com.googlecode.easyec.cache.serializer.impl.ByteArraySerializerFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,15 @@ import org.slf4j.LoggerFactory;
 public class CacheResourceProvider implements CacheProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheResourceProvider.class);
-    private SerializerFactory serializerFactory = new DefaultSerializerFactory();
+
+    private SerializerFactory<byte[]> serializerFactory = new ByteArraySerializerFactory();
     private CacheResource cacheResource;
 
     public CacheResourceProvider(CacheResource cacheResource) {
         this(cacheResource, null);
     }
 
-    public CacheResourceProvider(CacheResource cacheResource, SerializerFactory serializerFactory) {
+    public CacheResourceProvider(CacheResource cacheResource, SerializerFactory<byte[]> serializerFactory) {
         this.cacheResource = cacheResource;
 
         if (null != serializerFactory) {
@@ -72,15 +73,15 @@ public class CacheResourceProvider implements CacheProvider {
         }
     }
 
-    public Object get(String cacheName, Object cacheKey) throws CacheException {
+    public CacheElement get(String cacheName, Object cacheKey) throws CacheException {
         if (cacheKey == null) return null;
 
         ClientResponse res = (ClientResponse) cacheResource.get(cacheName, String.valueOf(cacheKey));
 
         try {
             Object entity = res.getEntity(CacheObject.class);
-
-            return entity != null ? serializerFactory.readObject(((CacheObject) entity).getSer()) : null;
+            return entity == null ? null
+                : (CacheElement) serializerFactory.readObject(((CacheObject) entity).getSer());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
 

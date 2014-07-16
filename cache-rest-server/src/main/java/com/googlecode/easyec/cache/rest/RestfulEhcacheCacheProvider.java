@@ -2,10 +2,12 @@ package com.googlecode.easyec.cache.rest;
 
 import com.googlecode.easyec.cache.CacheElement;
 import com.googlecode.easyec.cache.CacheException;
-import com.googlecode.easyec.cache.ehcache.internal.EhcacheDefaultCacheProvider;
+import com.googlecode.easyec.cache.ehcache.internal.DefaultEhcacheCacheProvider;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
+import java.io.Serializable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +16,7 @@ import net.sf.ehcache.Element;
  * Time: 上午12:43
  * To change this template use File | Settings | File Templates.
  */
-public class RestfulEhcacheCacheProvider extends EhcacheDefaultCacheProvider {
+public class RestfulEhcacheCacheProvider extends DefaultEhcacheCacheProvider {
 
     public RestfulEhcacheCacheProvider(CacheManager cacheManager) {
         super(cacheManager);
@@ -75,21 +77,21 @@ public class RestfulEhcacheCacheProvider extends EhcacheDefaultCacheProvider {
         }
     }
 
-    public Object get(String cacheName, Object cacheKey) throws CacheException {
+    public CacheElement get(String cacheName, Object cacheKey) throws CacheException {
         try {
             Element element = cacheManager.getCache(cacheName).get(cacheKey);
-            if (element != null) {
-                Object o = element.getValue();
-                if (o instanceof CacheElement) {
-                    CacheElement e = (CacheElement) o;
-                    e.setHitCount(element.getHitCount());
-                    e.setLastUpdateTime(element.getLastUpdateTime());
-                }
+            if (element == null) return null;
 
-                return o;
+            Serializable val = element.getValue();
+            if (val instanceof CacheElement) {
+                return (CacheElement) val;
             }
 
-            return null;
+            return new CacheElement.Builder(
+                element.getKey(), element.getValue()
+            ).hitCount(element.getHitCount())
+                .lastUpdateTime(element.getLastUpdateTime())
+                .build();
         } catch (Exception e) {
             throw new CacheException(e);
         }
