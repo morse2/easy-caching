@@ -3,12 +3,12 @@
     <parent>
         <groupId>com.googlecode.easyec</groupId>
         <artifactId>caching</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ehcache-conf</artifactId>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>ehcache-config</name>
     <url>http://code.google.com/p/easyec</url>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.googlecode.easyec</groupId>
             <artifactId>ehcache-impl</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.5.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

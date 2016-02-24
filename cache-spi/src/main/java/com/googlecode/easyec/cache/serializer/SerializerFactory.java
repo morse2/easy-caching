@@ -9,7 +9,7 @@ package com.googlecode.easyec.cache.serializer;
 public interface SerializerFactory<T> {
 
     /**
-     * 将对象序列化成二进制数据
+     * 将对象序列化成指定的数据格式
      *
      * @param o 要被序列化的对象
      * @return 序列化后的对象类型
@@ -18,7 +18,7 @@ public interface SerializerFactory<T> {
     T writeObject(Object o) throws SerializationException;
 
     /**
-     * 读取二进制数据，并反序列化成对象
+     * 读取从缓存传递过来的数据格式，并反序列化成对象
      *
      * @param p 参数类型
      * @return 反序列化出来的对象实例
