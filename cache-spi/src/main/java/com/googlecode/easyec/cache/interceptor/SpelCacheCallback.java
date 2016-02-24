@@ -5,8 +5,6 @@ import org.springframework.expression.EvaluationContext;
 
 import java.lang.reflect.Method;
 
-import static org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode;
-
 /**
  * Spring EL缓存操作回调类。
  *
@@ -51,10 +49,11 @@ public abstract class SpelCacheCallback {
     protected String parseCacheKey(Method method, Object[] args, Object target, Class<?> targetClass) {
         EvaluationContext ctx = expressionEvaluator.createEvaluationContext(method, args, target, targetClass);
 
-        Object v = expressionEvaluator.key(key, method, ctx);
+        Object v = expressionEvaluator.key(getKey(), method, ctx);
 
         if (null != v) {
-            return String.valueOf(reflectionHashCode(v));
+            if (v instanceof String) return (String) v;
+            return v.toString();
         }
 
         return null;
